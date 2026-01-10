@@ -1,0 +1,19 @@
+# Web Framework
+fastapi
+uvicorn
+python-dotenv
+pydantic
+
+# LangChain & AI
+langchain
+langchain-core
+langchain-openai
+langchain-community
+langchain-text-splitters
+
+# Vector Store
+faiss-cpu
+
+# Utilities
+tiktoken
+numpy

@@ -1,0 +1,16 @@
+Title: Backend Architecture Overview
+Context: Microservices System
+
+1. Overview
+Our backend is composed of 4 main services running on Kubernetes (AKS).
+
+2. Services
+- Auth Service (Python/FastAPI): Handles JWT issuance and user validation.
+- Payment Service (Node.js): Integrates with Stripe. Handles checkout flows.
+- Inventory Service (Go): Manages stock levels and SKU logic. High-throughput.
+- Notification Service (Python/Celery): Async email and SMS dispatch.
+
+3. Databases
+- Primary: PostgreSQL (managed Azure SQL) for transactional data.
+- Caching: Redis for session storage and frequent queries.
+- Analytics: Snowflake (data synced nightly via ETL).

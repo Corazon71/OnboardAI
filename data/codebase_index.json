@@ -1,0 +1,26 @@
+{
+  "auth_login": {
+    "file": "services/auth-service/src/routes/login.py",
+    "description": "Handles user login, password validation, and JWT token generation."
+  },
+  "auth_middleware": {
+    "file": "services/auth-service/src/core/security.py",
+    "description": "Validates Bearer tokens in HTTP headers for protected routes."
+  },
+  "stripe_payment": {
+    "file": "services/payment-service/src/controllers/stripeHandler.js",
+    "description": "Process credit card charges using Stripe Intent API."
+  },
+  "user_schema": {
+    "file": "shared/schemas/user_v1.json",
+    "description": "Defines the database schema for User entities."
+  },
+  "db_connection": {
+    "file": "services/common/database/connector.py",
+    "description": "Pool manager for PostgreSQL connections using SQLAlchemy."
+  },
+  "celery_config": {
+    "file": "services/notification-service/config/celery_app.py",
+    "description": "Configuration for Redis broker and task queues."
+  }
+}

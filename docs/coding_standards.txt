@@ -1,0 +1,16 @@
+Title: Coding Standards & Git Workflow
+
+1. Python Guidelines
+- Follow PEP8.
+- Use 'Black' for formatting.
+- Type hinting (Pydantic models) is mandatory for all new API endpoints.
+
+2. Git Workflow
+- Main Branch: 'main' (Protected).
+- Feature Branches: 'feat/ticket-id-description'.
+- Pull Requests: Must have 2 approvals. CI tests must pass before merge.
+
+3. API Design
+- Use RESTful conventions.
+- All endpoints must return standard JSON envelopes: { "data": ..., "meta": ... }
+- Versioning is done via URL prefix (e.g., /api/v1/).

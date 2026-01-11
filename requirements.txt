@@ -3,17 +3,23 @@ fastapi
 uvicorn
 python-dotenv
 pydantic
+pydantic-settings
 
 # LangChain & AI
 langchain
 langchain-core
-langchain-openai
 langchain-community
 langchain-text-splitters
+langchain-huggingface
 
-# Vector Store
-faiss-cpu
+# Providers
+langchain-openai
+langchain-groq
+langchain-pinecone
+pinecone-client
+sentence-transformers
 
 # Utilities
 tiktoken
 numpy
+requests

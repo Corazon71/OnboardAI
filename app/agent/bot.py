@@ -15,7 +15,40 @@ def create_agent_wrapper(model, tools):
     This mimics the syntax you provided.
     """
     # Use the new create_agent method with system_prompt
-    system_prompt = "You are a helpful AI assistant. Use the provided tools to answer questions."
+    system_prompt = """You are a helpful AI assistant. Follow these guidelines:
+
+TOOL SELECTION STRATEGY:
+1. For questions about COMPANY POLICIES, CODING STANDARDS, ONBOARDING, or INTERNAL DOCUMENTS:
+   → Use lookup_policy_docs FIRST
+   → Examples: "coding standards", "git workflow", "onboarding process", "company policies"
+
+2. For questions about CODE FILES, REPOSITORY STRUCTURE, or SPECIFIC IMPLEMENTATIONS:
+   → Use search_codebase FIRST to find relevant files
+   → Then use read_file if you need to see actual code content
+   → Examples: "show me auth code", "where is UserSchema", "implementation of X"
+
+3. For general questions that don't require external information:
+   → Answer directly without using tools
+
+IMPORTANT RULES:
+- Use ONLY ONE tool at a time - start with the most appropriate tool
+- After getting tool results, provide a complete answer
+- DO NOT chain multiple tool calls unless absolutely necessary
+- If a tool returns no useful results, answer based on your general knowledge
+- STOP after providing the answer - do not continue searching
+
+Available tools:
+- search_codebase: Find files in GitHub repository (for code-related questions)
+- read_file: Read content of specific files (after finding them with search_codebase)
+- lookup_policy_docs: Search internal company documents (for policy/standard questions)
+
+DECISION EXAMPLES:
+User: "What are the coding standards?" → Use lookup_policy_docs
+User: "Show me the auth implementation" → Use search_codebase, then read_file
+User: "How does git workflow work?" → Use lookup_policy_docs
+User: "Where is the database schema?" → Use search_codebase
+
+CRITICAL: Think before calling tools - choose the RIGHT tool for the question type."""
     
     # Construct the agent using the new create_agent method
     agent = create_agent(
@@ -51,10 +84,14 @@ agent_with_memory = RunnableWithMessageHistory(
 
 async def ask_agent(query: str, session_id: str) -> Dict[str, Any]:
     try:
-        # Run the agent with new message format
+        # Run the agent with recursion limit and timeout
         response = await agent_with_memory.ainvoke(
             {"messages": [{"role": "user", "content": query}]},
-            config={"configurable": {"session_id": session_id}}
+            config={
+                "configurable": {"session_id": session_id},
+                "recursion_limit": 10,  # Prevent infinite loops
+                "max_execution_time": 30  # 30 second timeout
+            }
         )
         # Extract the last message content from the response
         messages = response.get("messages", [])
@@ -68,7 +105,15 @@ async def ask_agent(query: str, session_id: str) -> Dict[str, Any]:
             "source": ["Agent"]
         }
     except Exception as e:
-        return {
-            "answer": f"Error: {str(e)}",
-            "source": ["Error"]
-        }
+        # Handle recursion limit and other errors gracefully
+        error_msg = str(e)
+        if "recursion limit" in error_msg.lower():
+            return {
+                "answer": "I apologize, but I encountered an issue processing your request. Please try rephrasing your question or ask something simpler.",
+                "source": ["Error"]
+            }
+        else:
+            return {
+                "answer": f"Error: {error_msg}",
+                "source": ["Error"]
+            }

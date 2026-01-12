@@ -29,8 +29,8 @@ class Settings(BaseSettings):
     DOCS_PATH: str = "docs/"
 
     # Github Config
-    GITHUB_REPO_OWNER: str = "langchain-ai" # Default fallback
-    GITHUB_REPO_NAME: str = "langchain"     # Default fallback
+    GITHUB_REPO_OWNER: str = "Corazon71" # Your GitHub username
+    GITHUB_REPO_NAME: str = "OnboardAI"     # Your repository name
     GITHUB_TOKEN: Optional[str] = None
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")

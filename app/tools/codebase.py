@@ -25,14 +25,17 @@ def search_codebase(query: str) -> str:
     try:
         print(f" Agent is searching GitHub for: '{query}'...")
         
+        # Check if GitHub credentials are configured
+        if not settings.GITHUB_TOKEN:
+            return "GitHub token not configured. Please set GITHUB_TOKEN in your environment variables to search repositories."
+        
         # Construct the API URL
         base_url = "https://api.github.com/search/code"
         search_query = f"{query} repo:{settings.GITHUB_REPO_OWNER}/{settings.GITHUB_REPO_NAME}"
         params = {"q": search_query, "per_page": 5} # Limit to top 5 results
         
         headers = {"Accept": "application/vnd.github.v3+json"}
-        if settings.GITHUB_TOKEN:
-            headers["Authorization"] = f"token {settings.GITHUB_TOKEN}"
+        headers["Authorization"] = f"token {settings.GITHUB_TOKEN}"
 
         # Make the request
         response = requests.get(base_url, params=params, headers=headers)

@@ -1,0 +1,240 @@
+// Configuration
+const API_BASE_URL = 'http://localhost:8000';
+let sessionId = 'session_' + Date.now();
+
+// DOM Elements
+const chatMessages = document.getElementById('chatMessages');
+const messageInput = document.getElementById('messageInput');
+const sendButton = document.getElementById('sendButton');
+const charCount = document.getElementById('charCount');
+const typingIndicator = document.getElementById('typingIndicator');
+const errorModal = document.getElementById('errorModal');
+const errorMessage = document.getElementById('errorMessage');
+
+// State
+let isLoading = false;
+
+// Initialize
+document.addEventListener('DOMContentLoaded', () => {
+  // Load session ID from localStorage or create new one
+  const savedSessionId = localStorage.getItem('sessionId');
+  if (savedSessionId) {
+    sessionId = savedSessionId;
+  } else {
+    localStorage.setItem('sessionId', sessionId);
+  }
+
+  // Event listeners
+  sendButton.addEventListener('click', sendMessage);
+  messageInput.addEventListener('keypress', handleKeyPress);
+  messageInput.addEventListener('input', updateCharCount);
+
+  // Focus input on load
+  messageInput.focus();
+});
+
+// Handle Enter key
+function handleKeyPress(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage();
+  }
+}
+
+// Update character count
+function updateCharCount() {
+  const length = messageInput.value.length;
+  charCount.textContent = length;
+
+  if (length > 900) {
+    charCount.style.color = 'var(--warning-color)';
+  } else if (length >= 1000) {
+    charCount.style.color = 'var(--error-color)';
+  } else {
+    charCount.style.color = 'var(--secondary-text)';
+  }
+}
+
+// Send message
+async function sendMessage() {
+  const message = messageInput.value.trim();
+
+  if (!message || isLoading) return;
+
+  // Add user message to chat
+  addMessage(message, 'user');
+
+  // Clear input
+  messageInput.value = '';
+  updateCharCount();
+
+  // Show typing indicator
+  showTypingIndicator();
+  isLoading = true;
+  sendButton.disabled = true;
+
+  try {
+    // Call API
+    const response = await fetch(`${API_BASE_URL}/ask`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        query: message,
+        session_id: sessionId
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    // Add bot response to chat
+    addMessage(data.answer, 'bot', data.source);
+
+  } catch (error) {
+    console.error('Error:', error);
+    showError('Failed to connect to the server. Please check your connection and try again.');
+  } finally {
+    hideTypingIndicator();
+    isLoading = false;
+    sendButton.disabled = false;
+    messageInput.focus();
+  }
+}
+
+// Add message to chat
+function addMessage(content, sender, sources = []) {
+  const messageDiv = document.createElement('div');
+  messageDiv.className = `message ${sender}-message`;
+
+  const avatarDiv = document.createElement('div');
+  avatarDiv.className = 'message-avatar';
+  avatarDiv.innerHTML = sender === 'user' ?
+    '<i class="fas fa-user"></i>' :
+    '<i class="fas fa-robot"></i>';
+
+  const contentDiv = document.createElement('div');
+  contentDiv.className = 'message-content';
+
+  // Format content with sources
+  let formattedContent = content;
+  if (sources && sources.length > 0) {
+    formattedContent += '\n\n<div class="sources"><strong>Sources:</strong><ul>';
+    sources.forEach(source => {
+      formattedContent += `<li>${source}</li>`;
+    });
+    formattedContent += '</ul></div>';
+  }
+
+  contentDiv.innerHTML = formatMessage(formattedContent);
+
+  messageDiv.appendChild(avatarDiv);
+  messageDiv.appendChild(contentDiv);
+
+  chatMessages.appendChild(messageDiv);
+
+  // Scroll to bottom
+  scrollToBottom();
+}
+
+// Format message with basic markdown support
+function formatMessage(text) {
+  return text
+    .replace(/\n/g, '<br>')
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+    .replace(/`(.*?)`/g, '<code>$1</code>')
+    .replace(/```(.*?)```/gs, '<pre><code>$1</code></pre>');
+}
+
+// Show typing indicator
+function showTypingIndicator() {
+  typingIndicator.style.display = 'flex';
+  scrollToBottom();
+}
+
+// Hide typing indicator
+function hideTypingIndicator() {
+  typingIndicator.style.display = 'none';
+}
+
+// Scroll to bottom of chat
+function scrollToBottom() {
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+// Show error modal
+function showError(message) {
+  errorMessage.textContent = message;
+  errorModal.style.display = 'block';
+}
+
+// Close error modal
+function closeErrorModal() {
+  errorModal.style.display = 'none';
+}
+
+// Close modal when clicking outside
+window.addEventListener('click', (e) => {
+  if (e.target === errorModal) {
+    closeErrorModal();
+  }
+});
+
+// Close modal with Escape key
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && errorModal.style.display === 'block') {
+    closeErrorModal();
+  }
+});
+
+// Auto-resize textarea if needed (for future enhancement)
+function autoResize() {
+  messageInput.style.height = 'auto';
+  messageInput.style.height = Math.min(messageInput.scrollHeight, 120) + 'px';
+}
+
+// Add some helpful keyboard shortcuts
+document.addEventListener('keydown', (e) => {
+  // Ctrl/Cmd + K to clear chat
+  if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+    e.preventDefault();
+    if (confirm('Clear all messages?')) {
+      chatMessages.innerHTML = '';
+      // Re-add welcome message
+      addMessage('Hello! I\'m your AI assistant. How can I help you today?', 'bot');
+    }
+  }
+
+  // Ctrl/Cmd + / to focus input
+  if ((e.ctrlKey || e.metaKey) && e.key === '/') {
+    e.preventDefault();
+    messageInput.focus();
+  }
+});
+
+// Connection status indicator
+async function checkConnection() {
+  try {
+    const response = await fetch(`${API_BASE_URL}/`);
+    const data = await response.json();
+
+    if (data.status === 'running') {
+      document.querySelector('.status-text').textContent = 'Online';
+      document.querySelector('.status-dot').style.background = 'var(--success-color)';
+    }
+  } catch (error) {
+    document.querySelector('.status-text').textContent = 'Offline';
+    document.querySelector('.status-dot').style.background = 'var(--error-color)';
+  }
+}
+
+// Check connection on load
+checkConnection();
+
+// Check connection periodically
+setInterval(checkConnection, 30000); // Check every 30 seconds

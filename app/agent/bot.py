@@ -5,7 +5,7 @@ from langchain_community.chat_message_histories import ChatMessageHistory
 from langchain_core.runnables.history import RunnableWithMessageHistory
 
 from app.core.llm_factory import get_llm
-from app.tools.codebase import search_codebase
+from app.tools.codebase import search_codebase, read_file
 from app.tools.rag import lookup_policy_docs
 
 # --- 1. The Helper Function You Wanted ---
@@ -29,7 +29,7 @@ def create_agent_wrapper(model, tools):
 # --- 2. Setup ---
 # Load Model & Tools
 model = get_llm(temperature=0)
-tools = [search_codebase, lookup_policy_docs]
+tools = [search_codebase, read_file, lookup_policy_docs]
 
 # Create the Agent using the simple syntax
 agent = create_agent_wrapper(model, tools)

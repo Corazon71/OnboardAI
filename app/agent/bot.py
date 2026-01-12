@@ -84,9 +84,15 @@ agent_with_memory = RunnableWithMessageHistory(
 
 async def ask_agent(query: str, session_id: str) -> Dict[str, Any]:
     try:
-        # Run the agent with recursion limit and timeout
+        # Get session history to include in the conversation
+        session_history = get_session_history(session_id)
+        
+        # Add the new user message to history
+        session_history.add_user_message(query)
+        
+        # Run the agent with the full conversation history
         response = await agent_with_memory.ainvoke(
-            {"messages": [{"role": "user", "content": query}]},
+            {"messages": session_history.messages},
             config={
                 "configurable": {"session_id": session_id},
                 "recursion_limit": 10,  # Prevent infinite loops
@@ -97,6 +103,8 @@ async def ask_agent(query: str, session_id: str) -> Dict[str, Any]:
         messages = response.get("messages", [])
         if messages and hasattr(messages[-1], 'content') and messages[-1].type == "ai":
             answer = messages[-1].content
+            # Add AI response to session history
+            session_history.add_ai_message(answer)
         else:
             answer = "No response generated"
         

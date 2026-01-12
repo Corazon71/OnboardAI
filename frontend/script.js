@@ -127,7 +127,7 @@ function addMessage(content, sender, sources = []) {
   contentDiv.innerHTML = formattedContent;
 
   // Add source attribution if sources exist
-  if (sources && sources.length > 0 && !sources.includes('Agent') && !sources.includes('Error')) {
+  if (sources && sources.length > 0) {
     const sourceDiv = document.createElement('div');
     sourceDiv.className = 'source-attribution';
 

@@ -120,35 +120,65 @@ function addMessage(content, sender, sources = []) {
   const contentDiv = document.createElement('div');
   contentDiv.className = 'message-content';
 
-  // Format content with sources
-  let formattedContent = content;
-  if (sources && sources.length > 0) {
-    formattedContent += '\n\n<div class="sources"><strong>Sources:</strong><ul>';
-    sources.forEach(source => {
-      formattedContent += `<li>${source}</li>`;
-    });
-    formattedContent += '</ul></div>';
-  }
+  // Convert markdown to HTML
+  const formattedContent = renderMarkdown(content);
 
-  contentDiv.innerHTML = formatMessage(formattedContent);
+  // Add main content
+  contentDiv.innerHTML = formattedContent;
+
+  // Add source attribution if sources exist
+  if (sources && sources.length > 0 && !sources.includes('Agent') && !sources.includes('Error')) {
+    const sourceDiv = document.createElement('div');
+    sourceDiv.className = 'source-attribution';
+
+    const sourceIcon = document.createElement('i');
+    sourceIcon.className = 'fas fa-link';
+
+    const sourceText = document.createElement('span');
+    sourceText.textContent = `Sources: ${sources.join(', ')}`;
+
+    sourceDiv.appendChild(sourceIcon);
+    sourceDiv.appendChild(sourceText);
+    contentDiv.appendChild(sourceDiv);
+  }
 
   messageDiv.appendChild(avatarDiv);
   messageDiv.appendChild(contentDiv);
 
   chatMessages.appendChild(messageDiv);
 
+  // Highlight code blocks
+  Prism.highlightAllUnder(contentDiv);
+
   // Scroll to bottom
   scrollToBottom();
 }
 
-// Format message with basic markdown support
-function formatMessage(text) {
-  return text
-    .replace(/\n/g, '<br>')
-    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-    .replace(/\*(.*?)\*/g, '<em>$1</em>')
-    .replace(/`(.*?)`/g, '<code>$1</code>')
-    .replace(/```(.*?)```/gs, '<pre><code>$1</code></pre>');
+// Render markdown content
+function renderMarkdown(text) {
+  // Configure marked options
+  marked.setOptions({
+    breaks: true,
+    gfm: true,
+    sanitize: false,
+    highlight: function (code, lang) {
+      if (Prism.languages[lang]) {
+        return Prism.highlight(code, Prism.languages[lang], lang);
+      }
+      return code;
+    }
+  });
+
+  // Convert markdown to HTML
+  let html = marked.parse(text);
+
+  // Clean up any remaining HTML entities
+  html = html
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&amp;/g, '&');
+
+  return html;
 }
 
 // Show typing indicator

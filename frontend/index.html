@@ -1,12 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>OnboardAI - AI Assistant</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.css" rel="stylesheet">
 </head>
+
 <body>
     <div class="container">
         <!-- Header -->
@@ -60,12 +65,9 @@
         <footer class="input-area">
             <div class="input-container">
                 <div class="input-wrapper">
-                    <input 
-                        type="text" 
-                        id="messageInput" 
+                    <input type="text" id="messageInput"
                         placeholder="Ask me anything about company policies, code, or documentation..."
-                        maxlength="1000"
-                    >
+                        maxlength="1000">
                     <button id="sendButton" class="send-button">
                         <i class="fas fa-paper-plane"></i>
                     </button>
@@ -95,4 +97,5 @@
 
     <script src="script.js"></script>
 </body>
+
 </html>

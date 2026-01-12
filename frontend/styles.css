@@ -28,6 +28,8 @@ body {
     line-height: 1.6;
     height: 100vh;
     overflow: hidden;
+    margin: 0;
+    padding: 0;
 }
 
 /* Container */
@@ -35,8 +37,8 @@ body {
     display: flex;
     flex-direction: column;
     height: 100vh;
-    max-width: 1200px;
-    margin: 0 auto;
+    width: 100%;
+    max-width: 100%;
     background: var(--primary-bg);
 }
 
@@ -177,22 +179,104 @@ body {
     border-color: var(--accent-color);
 }
 
+/* Markdown Styles */
+.message-content h1, .message-content h2, .message-content h3,
+.message-content h4, .message-content h5, .message-content h6 {
+    margin: 1rem 0 0.5rem 0;
+    color: var(--primary-text);
+    font-weight: 600;
+}
+
+.message-content h1 { font-size: 1.5rem; }
+.message-content h2 { font-size: 1.3rem; }
+.message-content h3 { font-size: 1.1rem; }
+
 .message-content p {
     margin-bottom: 0.75rem;
+    color: var(--primary-text);
 }
 
 .message-content p:last-child {
     margin-bottom: 0;
 }
 
-.message-content ul {
-    margin-left: 1.5rem;
-    margin-bottom: 0.75rem;
+.message-content ul, .message-content ol {
+    margin: 0.75rem 0;
+    padding-left: 1.5rem;
 }
 
 .message-content li {
     margin-bottom: 0.25rem;
     color: var(--secondary-text);
+}
+
+.message-content code {
+    background: var(--tertiary-bg);
+    color: var(--accent-color);
+    padding: 0.2rem 0.4rem;
+    border-radius: 4px;
+    font-family: 'Fira Code', 'Consolas', monospace;
+    font-size: 0.9rem;
+}
+
+.message-content pre {
+    background: #1e1e1e;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1rem;
+    margin: 0.75rem 0;
+    overflow-x: auto;
+    font-family: 'Fira Code', 'Consolas', monospace;
+    font-size: 0.85rem;
+    line-height: 1.4;
+}
+
+.message-content pre code {
+    background: none;
+    padding: 0;
+    color: var(--primary-text);
+}
+
+.message-content blockquote {
+    border-left: 3px solid var(--accent-color);
+    padding-left: 1rem;
+    margin: 0.75rem 0;
+    color: var(--secondary-text);
+    font-style: italic;
+}
+
+.message-content a {
+    color: var(--accent-color);
+    text-decoration: none;
+}
+
+.message-content a:hover {
+    text-decoration: underline;
+}
+
+/* Source Attribution */
+.source-attribution {
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+    color: var(--secondary-text);
+}
+
+.source-attribution i {
+    color: var(--accent-color);
+}
+
+.source-badge {
+    background: var(--tertiary-bg);
+    color: var(--accent-color);
+    padding: 0.2rem 0.5rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 500;
 }
 
 /* Typing Indicator */

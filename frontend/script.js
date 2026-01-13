@@ -1,5 +1,5 @@
 // Configuration
-const API_BASE_URL = 'http://localhost:onboardai-d0dab4frh4hhffaq.centralindia-01.azurewebsites.net';
+const API_BASE_URL = 'https://onboardai-d0dab4frh4hhffaq.centralindia-01.azurewebsites.net';
 
 function getSessionId() {
   let sessionId = localStorage.getItem("session_id");

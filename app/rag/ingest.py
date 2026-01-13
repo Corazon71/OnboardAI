@@ -1,6 +1,6 @@
 import os
 import time
-from langchain_community.document_loaders import DirectoryLoader, TextLoader
+from langchain_community.document_loaders import DirectoryLoader, TextLoader, PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_pinecone import PineconeVectorStore
 from pinecone import Pinecone, ServerlessSpec
@@ -14,13 +14,26 @@ def ingest_docs():
     
     # 1. Load Documents
     print(f"Loading documents from {settings.DOCS_PATH}...")
-    loader = DirectoryLoader(
+    
+    # Load PDF files
+    pdf_loader = DirectoryLoader(
+        settings.DOCS_PATH, 
+        glob="**/*.pdf", 
+        loader_cls=PyPDFLoader
+    )
+    pdf_docs = pdf_loader.load()
+    
+    # Load TXT files (if any)
+    txt_loader = DirectoryLoader(
         settings.DOCS_PATH, 
         glob="**/*.txt", 
         loader_cls=TextLoader
     )
-    raw_docs = loader.load()
-    print(f"Loaded {len(raw_docs)} documents.")
+    txt_docs = txt_loader.load()
+    
+    # Combine all documents
+    raw_docs = pdf_docs + txt_docs
+    print(f"Loaded {len(pdf_docs)} PDF files and {len(txt_docs)} TXT files. Total: {len(raw_docs)} documents.")
 
     # 2. Split Text
     # We use a smaller chunk size for code/technical docs to keep context precise

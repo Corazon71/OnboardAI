@@ -4,7 +4,6 @@ gunicorn
 python-dotenv
 pydantic
 pydantic-settings
-# Using unpinned versions ensures compatibility
 langchain
 langchain-community
 langchain-openai
@@ -15,3 +14,4 @@ pinecone-client
 tiktoken
 numpy
 requests
+pypdf

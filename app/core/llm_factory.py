@@ -7,6 +7,10 @@ from app.core.config import settings
 def get_llm(temperature: float = 0):
     # ... (Keep existing code) ...
     if settings.LLM_PROVIDER == "azure":
+        if not settings.AZURE_OPENAI_API_KEY:
+            raise ValueError("Azure provider selected but AZURE_OPENAI_API_KEY is missing.")
+        if not settings.AZURE_OPENAI_ENDPOINT:
+            raise ValueError("Azure provider selected but AZURE_OPENAI_ENDPOINT is missing.")
         return AzureChatOpenAI(
             azure_deployment=settings.AZURE_DEPLOYMENT_NAME,
             openai_api_version=settings.AZURE_OPENAI_API_VERSION,

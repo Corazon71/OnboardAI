@@ -60,12 +60,37 @@ CRITICAL: Think before calling tools - choose the RIGHT tool for the question ty
     return agent
 
 # --- 2. Setup ---
-# Load Model & Tools
-model = get_llm(temperature=0)
-tools = [search_codebase, read_file, lookup_policy_docs]
+# Global variables for lazy initialization
+model = None
+agent = None
+agent_with_memory = None
 
-# Create the Agent using the simple syntax
-agent = create_agent_wrapper(model, tools)
+def get_model():
+    """Lazy initialization of the LLM model"""
+    global model
+    if model is None:
+        model = get_llm(temperature=0)
+    return model
+
+def get_agent():
+    """Lazy initialization of the agent"""
+    global agent
+    if agent is None:
+        tools = [search_codebase, read_file, lookup_policy_docs]
+        agent = create_agent_wrapper(get_model(), tools)
+    return agent
+
+def get_agent_with_memory():
+    """Lazy initialization of the agent with memory"""
+    global agent_with_memory
+    if agent_with_memory is None:
+        agent_with_memory = RunnableWithMessageHistory(
+            get_agent(),
+            get_session_history,
+            input_messages_key="messages",
+            history_messages_key="chat_history",
+        )
+    return agent_with_memory
 
 # --- 3. Memory & Execution ---
 store = {}
@@ -73,14 +98,6 @@ def get_session_history(session_id: str):
     if session_id not in store:
         store[session_id] = ChatMessageHistory()
     return store[session_id]
-
-# Wrap with Memory
-agent_with_memory = RunnableWithMessageHistory(
-    agent,
-    get_session_history,
-    input_messages_key="messages",
-    history_messages_key="chat_history",
-)
 
 async def ask_agent(query: str, session_id: str) -> Dict[str, Any]:
     try:
@@ -91,7 +108,7 @@ async def ask_agent(query: str, session_id: str) -> Dict[str, Any]:
         session_history.add_user_message(query)
         
         # Run the agent with the full conversation history
-        response = await agent_with_memory.ainvoke(
+        response = await get_agent_with_memory().ainvoke(
             {"messages": session_history.messages},
             config={
                 "configurable": {"session_id": session_id},

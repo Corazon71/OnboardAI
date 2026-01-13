@@ -1,5 +1,6 @@
 fastapi
 uvicorn
+gunicorn
 python-dotenv
 pydantic
 pydantic-settings
@@ -14,4 +15,3 @@ pinecone-client
 tiktoken
 numpy
 requests
-sentence-transformers

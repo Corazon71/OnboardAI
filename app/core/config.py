@@ -33,6 +33,9 @@ class Settings(BaseSettings):
     GITHUB_REPO_NAME: str = "OnboardAI"     # Your repository name
     GITHUB_TOKEN: Optional[str] = None
 
-    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+    model_config = SettingsConfigDict(
+        env_file=".env" if os.path.exists(".env") else None,
+        extra="ignore"
+    )
 
 settings = Settings()

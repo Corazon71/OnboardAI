@@ -1,4 +1,3 @@
-// Configuration
 const API_BASE_URL = 'https://onboardai-d0dab4frh4hhffaq.centralindia-01.azurewebsites.net';
 
 function getSessionId() {
@@ -10,7 +9,6 @@ function getSessionId() {
   return sessionId;
 }
 
-// DOM Elements
 const chatMessages = document.getElementById('chatMessages');
 const messageInput = document.getElementById('messageInput');
 const sendButton = document.getElementById('sendButton');
@@ -19,21 +17,15 @@ const typingIndicator = document.getElementById('typingIndicator');
 const errorModal = document.getElementById('errorModal');
 const errorMessage = document.getElementById('errorMessage');
 
-// State
 let isLoading = false;
 
-// Initialize
 document.addEventListener('DOMContentLoaded', () => {
-  // Event listeners
   sendButton.addEventListener('click', sendMessage);
   messageInput.addEventListener('keypress', handleKeyPress);
   messageInput.addEventListener('input', updateCharCount);
-
-  // Focus input on load
   messageInput.focus();
 });
 
-// Handle Enter key
 function handleKeyPress(e) {
   if (e.key === 'Enter' && !e.shiftKey) {
     e.preventDefault();
@@ -41,7 +33,6 @@ function handleKeyPress(e) {
   }
 }
 
-// Update character count
 function updateCharCount() {
   const length = messageInput.value.length;
   charCount.textContent = length;
@@ -55,26 +46,21 @@ function updateCharCount() {
   }
 }
 
-// Send message
 async function sendMessage() {
   const message = messageInput.value.trim();
 
   if (!message || isLoading) return;
 
-  // Add user message to chat
   addMessage(message, 'user');
 
-  // Clear input
   messageInput.value = '';
   updateCharCount();
 
-  // Show typing indicator
   showTypingIndicator();
   isLoading = true;
   sendButton.disabled = true;
 
   try {
-    // Call API
     const response = await fetch(`${API_BASE_URL}/ask`, {
       method: 'POST',
       headers: {
@@ -92,7 +78,6 @@ async function sendMessage() {
 
     const data = await response.json();
 
-    // Add bot response to chat
     addMessage(data.answer, 'bot', data.source);
 
   } catch (error) {
@@ -106,7 +91,6 @@ async function sendMessage() {
   }
 }
 
-// Add message to chat
 function addMessage(content, sender, sources = []) {
   const messageDiv = document.createElement('div');
   messageDiv.className = `message ${sender}-message`;
@@ -120,13 +104,10 @@ function addMessage(content, sender, sources = []) {
   const contentDiv = document.createElement('div');
   contentDiv.className = 'message-content';
 
-  // Convert markdown to HTML
   const formattedContent = renderMarkdown(content);
 
-  // Add main content
   contentDiv.innerHTML = formattedContent;
 
-  // Add source attribution if sources exist
   if (sources && sources.length > 0) {
     const sourceDiv = document.createElement('div');
     sourceDiv.className = 'source-attribution';
@@ -147,16 +128,12 @@ function addMessage(content, sender, sources = []) {
 
   chatMessages.appendChild(messageDiv);
 
-  // Highlight code blocks
   Prism.highlightAllUnder(contentDiv);
 
-  // Scroll to bottom
   scrollToBottom();
 }
 
-// Render markdown content
 function renderMarkdown(text) {
-  // Configure marked options
   marked.setOptions({
     breaks: true,
     gfm: true,
@@ -169,10 +146,8 @@ function renderMarkdown(text) {
     }
   });
 
-  // Convert markdown to HTML
   let html = marked.parse(text);
 
-  // Clean up any remaining HTML entities
   html = html
     .replace(/&lt;/g, '<')
     .replace(/&gt;/g, '>')
@@ -181,61 +156,51 @@ function renderMarkdown(text) {
   return html;
 }
 
-// Show typing indicator
 function showTypingIndicator() {
   typingIndicator.style.display = 'flex';
   scrollToBottom();
 }
 
-// Hide typing indicator
 function hideTypingIndicator() {
   typingIndicator.style.display = 'none';
 }
 
-// Scroll to bottom of chat
 function scrollToBottom() {
   chatMessages.scrollTop = chatMessages.scrollHeight;
 }
 
-// Show error modal
 function showError(message) {
   errorMessage.textContent = message;
   errorModal.style.display = 'block';
 }
 
-// Close error modal
 function closeErrorModal() {
   errorModal.style.display = 'none';
 }
 
-// Close modal when clicking outside
 window.addEventListener('click', (e) => {
   if (e.target === errorModal) {
     closeErrorModal();
   }
 });
 
-// Close modal with Escape key
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape' && errorModal.style.display === 'block') {
     closeErrorModal();
   }
 });
 
-// Auto-resize textarea if needed (for future enhancement)
 function autoResize() {
   messageInput.style.height = 'auto';
   messageInput.style.height = Math.min(messageInput.scrollHeight, 120) + 'px';
 }
 
-// Add some helpful keyboard shortcuts
 document.addEventListener('keydown', (e) => {
   // Ctrl/Cmd + K to clear chat
   if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
     e.preventDefault();
     if (confirm('Clear all messages?')) {
       chatMessages.innerHTML = '';
-      // Re-add welcome message
       addMessage('Hello! I\'m your AI assistant. How can I help you today?', 'bot');
     }
   }
@@ -247,7 +212,6 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
-// Connection status indicator
 async function checkConnection() {
   try {
     const response = await fetch(`${API_BASE_URL}/`);
@@ -263,8 +227,6 @@ async function checkConnection() {
   }
 }
 
-// Check connection on load
 checkConnection();
 
-// Check connection periodically
-setInterval(checkConnection, 30000); // Check every 30 seconds
+setInterval(checkConnection, 30000);

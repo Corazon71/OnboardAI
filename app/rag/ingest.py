@@ -36,7 +36,6 @@ def ingest_docs():
     print(f"Loaded {len(pdf_docs)} PDF files and {len(txt_docs)} TXT files. Total: {len(raw_docs)} documents.")
 
     # 2. Split Text
-    # We use a smaller chunk size for code/technical docs to keep context precise
     text_splitter = RecursiveCharacterTextSplitter(
         chunk_size=1000,
         chunk_overlap=100
@@ -48,8 +47,6 @@ def ingest_docs():
     embeddings = get_embeddings()
     
     # 4. Check/Create Pinecone Index
-    # Note: We rely on the user having created the index with correct dims manually
-    # to avoid admin-privilege complexity in code, but we check connection.
     print(f"Connecting to Pinecone Index: {settings.PINECONE_INDEX_NAME}")
     
     # Ensure Pinecone API Key is set

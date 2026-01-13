@@ -8,21 +8,18 @@ from app.core.config import settings
 
 app = FastAPI(title=settings.APP_NAME, version=settings.VERSION)
 
-# Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allows all origins for development
+    allow_origins=["*"],
     allow_credentials=True,
-    allow_methods=["*"],  # Allows all HTTP methods
-    allow_headers=["*"],  # Allows all headers
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
-# Request Model
 class QueryRequest(BaseModel):
     query: str
     session_id: str = "default-session"
 
-# Response Model
 class QueryResponse(BaseModel):
     answer: str
     source: List[str]
@@ -33,9 +30,7 @@ def health_check():
 
 @app.post("/ask", response_model=QueryResponse)
 async def chat_endpoint(request: QueryRequest):
-    """
-    Main endpoint for the AI Agent.
-    """
+    """Main endpoint for the AI Agent."""
     result = await ask_agent(request.query, request.session_id)
     return result
 

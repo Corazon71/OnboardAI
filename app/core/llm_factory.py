@@ -1,11 +1,9 @@
 from langchain_openai import AzureChatOpenAI, AzureOpenAIEmbeddings
 from langchain_groq import ChatGroq
-# CHANGE THIS IMPORT:
 from langchain_huggingface import HuggingFaceEmbeddings
 from app.core.config import settings
 
 def get_llm(temperature: float = 0):
-    # ... (Keep existing code) ...
     if settings.LLM_PROVIDER == "azure":
         if not settings.AZURE_OPENAI_API_KEY:
             raise ValueError("Azure provider selected but AZURE_OPENAI_API_KEY is missing.")
@@ -37,6 +35,5 @@ def get_embeddings():
             api_key=settings.AZURE_OPENAI_API_KEY,
          )
     
-    print("ℹ️ Using HuggingFace Local Embeddings (all-MiniLM-L6-v2)")
-    # This now uses the new, warning-free class
+    print("Using HuggingFace Local Embeddings (all-MiniLM-L6-v2)")
     return HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")

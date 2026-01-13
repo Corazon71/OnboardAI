@@ -1,6 +1,14 @@
 // Configuration
-const API_BASE_URL = 'http://localhost:8000';
-let sessionId = 'session_' + Date.now();
+const API_BASE_URL = 'http://localhost:onboardai-d0dab4frh4hhffaq.centralindia-01.azurewebsites.net';
+
+function getSessionId() {
+  let sessionId = localStorage.getItem("session_id");
+  if (!sessionId) {
+    sessionId = crypto.randomUUID();
+    localStorage.setItem("session_id", sessionId);
+  }
+  return sessionId;
+}
 
 // DOM Elements
 const chatMessages = document.getElementById('chatMessages');
@@ -16,14 +24,6 @@ let isLoading = false;
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
-  // Load session ID from localStorage or create new one
-  const savedSessionId = localStorage.getItem('sessionId');
-  if (savedSessionId) {
-    sessionId = savedSessionId;
-  } else {
-    localStorage.setItem('sessionId', sessionId);
-  }
-
   // Event listeners
   sendButton.addEventListener('click', sendMessage);
   messageInput.addEventListener('keypress', handleKeyPress);
@@ -82,7 +82,7 @@ async function sendMessage() {
       },
       body: JSON.stringify({
         query: message,
-        session_id: sessionId
+        session_id: getSessionId()
       })
     });
 

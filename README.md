@@ -1,5 +1,7 @@
 # OnboardAI
 
+**TLDR:** AI-powered employee onboarding assistant • RAG document search + GitHub code exploration • Smart tool routing for optimal responses • Session-based memory (UI refresh resets session) • Deployed on Azure with live demo
+
 An intelligent AI-powered assistant designed to streamline employee onboarding and provide instant access to company policies, documentation, and codebase information.
 
 ## Project Overview
@@ -35,11 +37,11 @@ The system helps new employees quickly find information about company policies, 
 - **Intelligent Document Search**: Query company policies, handbooks, and guidelines
 - **Codebase Exploration**: Search and read files from GitHub repositories
 - **Context-Aware Responses**: AI understands context and provides relevant answers
-- **Session Management**: Maintains conversation history across interactions
+- **Session Management**: Maintains conversation history across interactions (note: UI refresh resets session ID)
 - **Real-time Communication**: Live chat interface with typing indicators
 
 ### Smart Tool Selection
-The AI automatically determines the best tool to use based on query type:
+The AI automatically determines the best tool to use based on query type through intelligent tool calling:
 - **Policy Questions** → Uses RAG document search
 - **Code Questions** → Uses GitHub API search and file reading
 - **General Questions** → Uses LLM knowledge directly
